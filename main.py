@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
-from io import BytesIO
+import io
 
 def main():
-    st.title("Localytics Automation")
+    st.title("Excel Data Manipulation")
 
     # File uploads
-    uploaded_file1 = st.file_uploader("Upload Sessions File", type=["xlsx"])
-    uploaded_file2 = st.file_uploader("Upload Trained Users File", type=["xlsx"])
+    uploaded_file1 = st.file_uploader("Upload Excel1", type=["xlsx"])
+    uploaded_file2 = st.file_uploader("Upload Excel2", type=["xlsx"])
 
     if uploaded_file1 and uploaded_file2:
         st.write("Files uploaded successfully!")
@@ -38,13 +38,15 @@ def main():
                     email = row["Email"]
                     matching_sessions = excel1_df.loc[excel1_df["Email"] == email, "Sessions"].values
                     if len(matching_sessions) > 0:
-                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions") , matching_sessions[0])
+                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions"), matching_sessions[0])
 
-        excel3_writer.save()
+        excel3_writer.close()  # Close the writer
 
         # Provide download link for Excel3
-        excel3_data = open("Localytics.xlsx", "rb").read()
-        st.download_button("Download Localytics Excel", data=excel3_data, file_name="Excel3.xlsx")
+        excel3_data = io.BytesIO()
+        with open("Excel3.xlsx", "rb") as file:
+            excel3_data.write(file.read())
+        st.download_button("Download Excel3", data=excel3_data.getvalue(), file_name="Excel3.xlsx")
 
 if __name__ == "__main__":
     main()
