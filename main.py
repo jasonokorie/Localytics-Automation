@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import xlsxwriter
 from io import BytesIO
 
 def main():
@@ -20,7 +21,8 @@ def main():
         excel1_df["Email"] = excel1_df["Email"].str.strip()
 
         # Process Excel2 sheets and create Excel3
-        excel3_writer = pd.ExcelWriter("Excel3.xlsx", engine="xlsxwriter")
+        excel3_stream = BytesIO()
+        excel3_writer = pd.ExcelWriter(excel3_stream, engine="xlsxwriter")
         for sheet_name, sheet_data in excel2_df.items():
             # Add "Sessions" column and initialize with 0
             sheet_data["Sessions"] = 0
@@ -38,13 +40,13 @@ def main():
                     email = row["Email"]
                     matching_sessions = excel1_df.loc[excel1_df["Email"] == email, "Sessions"].values
                     if len(matching_sessions) > 0:
-                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions") , matching_sessions[0])
+                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions"), matching_sessions[0])
 
         excel3_writer.save()
+        excel3_stream.seek(0)
 
         # Provide download link for Excel3
-        excel3_data = open("Excel3.xlsx", "rb").read()
-        st.download_button("Download Excel3", data=excel3_data, file_name="Excel3.xlsx")
+        st.download_button("Download Excel3", data=excel3_stream.read(), file_name="Excel3.xlsx")
 
 if __name__ == "__main__":
     main()
