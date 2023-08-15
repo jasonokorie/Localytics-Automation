@@ -40,7 +40,7 @@ def main():
                     if len(matching_sessions) > 0:
                         excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions") , matching_sessions[0])
 
-        excel3_writer.save()
+        excel3_writer.close()
 
         # Provide download link for Excel3
         excel3_data = open("Excel3.xlsx", "rb").read()
