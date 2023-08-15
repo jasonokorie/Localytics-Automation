@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import io
+from io import BytesIO
 
 def main():
     st.title("Excel Data Manipulation")
@@ -38,15 +38,13 @@ def main():
                     email = row["Email"]
                     matching_sessions = excel1_df.loc[excel1_df["Email"] == email, "Sessions"].values
                     if len(matching_sessions) > 0:
-                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions"), matching_sessions[0])
+                        excel3_writer.sheets[sheet_name].write(index + 1, sheet_data.columns.get_loc("Sessions") , matching_sessions[0])
 
-        excel3_writer.close()  # Close the writer
+        excel3_writer.save()
 
         # Provide download link for Excel3
-        excel3_data = io.BytesIO()
-        with open("Excel3.xlsx", "rb") as file:
-            excel3_data.write(file.read())
-        st.download_button("Download Excel3", data=excel3_data.getvalue(), file_name="Excel3.xlsx")
+        excel3_data = open("Excel3.xlsx", "rb").read()
+        st.download_button("Download Excel3", data=excel3_data, file_name="Excel3.xlsx")
 
 if __name__ == "__main__":
     main()
